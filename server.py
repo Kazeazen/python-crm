@@ -35,7 +35,7 @@ def get_all_employees():
         all_employees = Employee.query.all()
         output = []
         for employee in all_employees:
-            emp_data = {'name': employee.name, 'job_title': employee.job_title, 'years_xp': employee.years_xp}
+            emp_data = {'id':employee.id, 'name': employee.name, 'job_title': employee.job_title, 'years_xp': employee.years_xp}
             output.append(emp_data)
         return {"employees": output}
 
@@ -62,6 +62,16 @@ def get_one_employee(id):
         return {"data": format_employee_data(employee_query)}
     if request.method == "PUT":
         employee_query = Employee.query.get_or_404(id)
+        emp_name = request.json.get("name", None)
+        emp_job_title = request.json.get("job_title", None)
+        emp_years_xp = request.json.get("years_xp", None)
+        if None in (emp_name, emp_job_title, emp_years_xp):
+            return "Improper data, retry", 400
+        employee_query.name = emp_name
+        employee_query.job_title = emp_job_title
+        employee_query.years_xp = emp_years_xp
+        db.session.commit()
+        return {"status":"Data has been updated"}
 
 if __name__ == "__main__":
     app.run(debug=True)
